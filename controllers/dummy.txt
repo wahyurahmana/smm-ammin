@@ -1,2 +1,0 @@
-inisialisai awal agar folder kosong dapat di push
-hapus jika sudah tidak digunakan
