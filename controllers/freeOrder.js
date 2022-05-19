@@ -1,72 +1,102 @@
 const axios = require('axios')
-const { Op } = require("sequelize");
+const sendEmail = require('../helpers/nodeMailer.js')
+const qs = require('qs');
 const {
-  FreeOrder
+  Op
+} = require("sequelize");
+const {
+  FreeOrder,
+  LimitTrxFree
 } = require('../models')
 
 class Controller {
 
-  static listAccountFree(req, res, next){
-    const listIdDelete = []
-    FreeOrder.findAll()
-    .then((result) => {
-      result.forEach((el)=>{
-        if(new Date().getDay() === new Date(el.createdAt).getDay()){
-          listIdDelete.push(el.id)
-        }
-      })
-      if (listIdDelete !== 0) {
-        FreeOrder.destroy({
-          where : {
-            id : {
-              [Op.in] : listIdDelete
-            }
-          }
-        })
-      }
-    }).catch((err) => {
-      next({status : 500, message : 'Internal Server Error'})
-    });
-  }
+  // static listAccountFree(req, res, next) {
+  //   const listIdDelete = []
+  //   FreeOrder.findAll()
+  //     .then((result) => {
+  //       result.forEach((el) => {
+  //         if (new Date().getDay() === new Date(el.createdAt).getDay()) {
+  //           listIdDelete.push(el.id)
+  //         }
+  //       })
+  //       if (listIdDelete !== 0) {
+  //         FreeOrder.destroy({
+  //           where: {
+  //             id: {
+  //               [Op.in]: listIdDelete
+  //             }
+  //           }
+  //         })
+  //       }
+  //     }).catch((err) => {
+  //       next({
+  //         status: 500,
+  //         message: 'Internal Server Error'
+  //       })
+  //     });
+  // }
   static getFree(req, res, next) {
-    let data
-    const listService = ['2982']
-    const isFound = listService.some(el => el === req.body.serviceId)
+    let dataFreeOrder
+    let dataDbFree
+    const listService = ['3274']
+    const isFound = listService.some(el => el == req.body.service)
     if (isFound) {
-      //process request api
-      axios({
+      const data = qs.stringify({
+        'service': `${req.body.service}`,
+        'target': `${req.body.target}`,
+        'quantity': '10',
+        'api_id': `${process.env.API_ID_IRVANKEDESMM}`,
+        'api_key': `${process.env.API_KEY_IRVANKEDESMM}`
+      });
+      const config = {
         method: 'post',
-        url: 'https://justanotherpanel.com/api/v2',
-        data: {
-          key : process.env.API_KEY_JAP,
-          action : 'add',
-          service : req.body.serviceId,
-          link : req.body.link,
-          quantity : 50
-        }
-      })
-      .then((result) => {
-        data = result.data
-        console.log(data);
-        //process insert data to db
-        return FreeOrder.create({
-          ServiceId : req.body.serviceId,
-          link : req.body.link,
-          quantity : 50
+        url: 'https://irvankedesmm.co.id/api/order',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        data: data
+      };
+
+      axios(config)
+        .then(function (response) {
+          dataFreeOrder = response.data;
+          return FreeOrder.create({
+            service: req.body.service,
+            target: req.body.target,
+            quantity: 10 //jumlahnya sesuai moodku
+          })
         })
-      })
-      .then((FreeOrder) => {
-        axios({
-          url : `https://api.telegram.org/bot${process.env.API_TELEGRAM_TOKEN}/sendMessage?text=${req.body.link} sedang menggunakan layanan free order&chat_id=612179633`,
-          method : 'GET'
+        .then((free) => {
+          dataDbFree = free
+          return LimitTrxFree.decrement({
+            qty: 1
+          }, {
+            where: {
+              id: 1
+            }
+          })
         })
-        res.status(201).json(FreeOrder)
-      })
-      .catch((err) => {
-        next(err)
-      })
+        .then((free) => {
+          axios({
+            url: `https://api.telegram.org/bot${process.env.API_TELEGRAM_TOKEN}/sendMessage?text=${req.body.target} sedang menggunakan layanan free order&chat_id=612179633`,
+            method: 'GET'
+          })
+          sendEmail('Free Order', `${req.body.target} sedang menggunakan layanan, dengan orderId ${dataFreeOrder.data.id}`)
+          res.status(201).json({
+            order: dataFreeOrder,
+            data: dataDbFree
+          })
+        })
+        .catch(function (error) {
+          console.log(error);
+          next(error);
+        });
     } else {
-      next({status : 404, message : 'service not found'})
+      next({
+        status: 404,
+        message: 'service not found'
+      })
     }
   }
 }

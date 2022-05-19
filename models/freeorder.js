@@ -14,22 +14,62 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
+
   FreeOrder.init({
-    ServiceId: DataTypes.INTEGER,
-    link: DataTypes.STRING,
-    quantity: DataTypes.INTEGER,
+    service: {
+      type : DataTypes.INTEGER,
+      allowNull : false,
+      validate : {
+        notEmpty : {
+          args : true,
+          msg : 'service is required'
+        },
+        notNull : {
+          args : true,
+          msg : 'service is required'
+        }
+      }
+    },
+    target: {
+      type : DataTypes.STRING,
+      allowNull : false,
+      validate : {
+        notEmpty : {
+          args : true,
+          msg : 'target is required'
+        },
+        notNull : {
+          args : true,
+          msg : 'target is required'
+        }
+      }
+    },
+    quantity: {
+      type : DataTypes.INTEGER,
+      allowNull : false,
+      validate : {
+        notEmpty : {
+          args : true,
+          msg : 'quantity is required'
+        },
+        notNull : {
+          args : true,
+          msg : 'quantity is required'
+        }
+      }
+    },
     mac_address: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'FreeOrder',
     hooks: {
-      beforeCreate(instance) {
-        macaddress.one()
-          .then((mac) => {
-            instance.mac_address = mac
-          }).catch((err) => {
-            console.log(err);
-          });
+      async beforeCreate (instance) {
+        try {
+          const mac = await macaddress.one()
+          instance.mac_address = mac
+        } catch (error) {
+          console.log(error);
+        }
       }
     }
   });

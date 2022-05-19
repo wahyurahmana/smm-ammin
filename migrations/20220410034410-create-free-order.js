@@ -8,11 +8,11 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      ServiceId: {
+      service: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-      link: {
+      target: {
         type: Sequelize.STRING,
         allowNull: false,
       },

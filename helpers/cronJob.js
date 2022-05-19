@@ -3,6 +3,7 @@ const {
   LimitTrxFree
 } = require('../models')
 const cron = require('node-cron');
+const axios = require('axios')
 
 const resetAccountFreeOrder = cron.schedule('0 0 * * *', () => {
   //berjalan setiap hari pukul 00:00
@@ -51,10 +52,7 @@ const resetAccountFreeOrder = cron.schedule('0 0 * * *', () => {
       })
     })
     .catch((err) => {
-      next({
-        status: 500,
-        message: 'Internal Server Error'
-      })
+      console.log(err);
     });
 });
 

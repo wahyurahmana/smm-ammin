@@ -1,5 +1,5 @@
 const {
-    FreeOrder
+    FreeOrder,LimitTrxFree
 } = require('../models')
 const macaddress = require('macaddress');
 
@@ -9,11 +9,11 @@ const checkUsername = function (req, res, next) {
     //validasinya belum sempurna
     FreeOrder.findOne({
             where: {
-                link: req.body.link
+                target: req.body.target
             }
         })
-        .then((linkUser) => {
-            if (linkUser) { //jika linkUser nya ada
+        .then((targetUser) => {
+            if (targetUser) { //jika targetUser nya ada
                 throw { status: 401, message: 'your account is limited, please try again in the next 7 days ' }
             } else {
                 next()
@@ -46,8 +46,22 @@ const checkMac = (req, res, next) => {
         });
 }
 
+//cek ketersedian limit harian
+const checkLimitTrx = (req, res, next) =>{
+    LimitTrxFree.findByPk(1)
+    .then((result) => {
+        if (result.qty <= 0) {
+            next({status : 401, message : "Daily transaction limit is up"})
+        } else {
+            next()
+        }
+    }).catch((err) => {
+        next({status : 400, message : "Limit Trx Not Found"})
+    });
+}
 
 module.exports = {
     checkUsername,
-    checkMac
+    checkMac,
+    checkLimitTrx
 }
