@@ -1,5 +1,4 @@
 const axios = require('axios')
-const sendEmail = require('../helpers/nodeMailer.js')
 const qs = require('qs');
 const {
   Op
@@ -57,11 +56,6 @@ class Controller {
             url: `https://api.telegram.org/bot${process.env.API_TELEGRAM_TOKEN}/sendMessage?text=${req.body.target} sedang menggunakan layanan free order&chat_id=612179633`,
             method: 'GET'
           })
-          // sendEmail('Free Order', `${req.body.target} sedang menggunakan layanan, dengan orderId ${dataFreeOrder.data.id}`)
-          // res.status(201).json({
-          //   order: dataFreeOrder,
-          //   data: dataDbFree
-          // })
         })
         .catch(function (error) {
           console.log(error);
