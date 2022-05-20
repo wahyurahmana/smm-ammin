@@ -11,31 +11,6 @@ const {
 
 class Controller {
 
-  // static listAccountFree(req, res, next) {
-  //   const listIdDelete = []
-  //   FreeOrder.findAll()
-  //     .then((result) => {
-  //       result.forEach((el) => {
-  //         if (new Date().getDay() === new Date(el.createdAt).getDay()) {
-  //           listIdDelete.push(el.id)
-  //         }
-  //       })
-  //       if (listIdDelete !== 0) {
-  //         FreeOrder.destroy({
-  //           where: {
-  //             id: {
-  //               [Op.in]: listIdDelete
-  //             }
-  //           }
-  //         })
-  //       }
-  //     }).catch((err) => {
-  //       next({
-  //         status: 500,
-  //         message: 'Internal Server Error'
-  //       })
-  //     });
-  // }
   static getFree(req, res, next) {
     let dataFreeOrder
     let dataDbFree
@@ -45,7 +20,7 @@ class Controller {
       const data = qs.stringify({
         'service': `${req.body.service}`,
         'target': `${req.body.target}`,
-        'quantity': '10',
+        'quantity': '50',
         'api_id': `${process.env.API_ID_IRVANKEDESMM}`,
         'api_key': `${process.env.API_KEY_IRVANKEDESMM}`
       });
@@ -64,7 +39,7 @@ class Controller {
           return FreeOrder.create({
             service: req.body.service,
             target: req.body.target,
-            quantity: 10 //jumlahnya sesuai moodku
+            quantity: 50 //jumlahnya sesuai moodku
           })
         })
         .then((free) => {
