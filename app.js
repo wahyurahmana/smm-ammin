@@ -40,6 +40,7 @@ app.post('/check-order', (req, res, next)=>{
     data : data
   })
     .then((result) => {
+      console.log(result.data);
       res.status(200).json(result.data)
     }).catch((err) => {
       next(err)
