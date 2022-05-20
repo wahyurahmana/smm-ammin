@@ -15,6 +15,7 @@ app.use(express.urlencoded({extended: true}))
 
 //Route
 const freeOrder = require('./routes/freeOrder.js')
+const auth = require('./routes/auth.js')
 
 
 app.get('/', (req, res) => {
@@ -23,6 +24,9 @@ app.get('/', (req, res) => {
 
 //fitur gratis
 app.use('/free-order', freeOrder)
+
+//auth
+app.use('/auth', auth)
 
 //check Orderan
 app.post('/check-order', (req, res, next)=>{

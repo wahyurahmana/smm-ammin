@@ -1,5 +1,6 @@
 const {
-    FreeOrder,LimitTrxFree
+    FreeOrder,
+    LimitTrxFree
 } = require('../models')
 const macaddress = require('macaddress');
 
@@ -14,7 +15,10 @@ const checkUsername = function (req, res, next) {
         })
         .then((targetUser) => {
             if (targetUser) { //jika targetUser nya ada
-                throw { status: 401, message: 'your account is limited, please try again in the next 7 days ' }
+                throw {
+                    status: 401,
+                    message: 'your account is limited, please try again in the next 7 days '
+                }
             } else {
                 next()
             }
@@ -34,7 +38,10 @@ const checkMac = (req, res, next) => {
                 })
                 .then((mac) => {
                     if (mac) { //jika mac nya ada
-                        throw { status: 401, message: 'your account is limited, please try again in the next 7 days ' }
+                        throw {
+                            status: 401,
+                            message: 'your account is limited, please try again in the next 7 days '
+                        }
                     } else {
                         next()
                     }
@@ -42,22 +49,31 @@ const checkMac = (req, res, next) => {
                     next(err)
                 });
         }).catch((err) => {
-            next({status : 400, message : "Mac Address inValid"})
+            next({
+                status: 400,
+                message: "Mac Address inValid"
+            })
         });
 }
 
 //cek ketersedian limit harian
-const checkLimitTrx = (req, res, next) =>{
+const checkLimitTrx = (req, res, next) => {
     LimitTrxFree.findByPk(1)
-    .then((result) => {
-        if (result.qty <= 0) {
-            next({status : 401, message : "Daily transaction limit is up"})
-        } else {
-            next()
-        }
-    }).catch((err) => {
-        next({status : 400, message : "Limit Trx Not Found"})
-    });
+        .then((result) => {
+            if (result.qty <= 0) {
+                next({
+                    status: 401,
+                    message: "Daily transaction limit is up"
+                })
+            } else {
+                next()
+            }
+        }).catch((err) => {
+            next({
+                status: 400,
+                message: "Limit Trx Not Found"
+            })
+        });
 }
 
 module.exports = {
