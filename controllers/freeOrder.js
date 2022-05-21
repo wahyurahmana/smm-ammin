@@ -20,7 +20,7 @@ class Controller {
         const data = qs.stringify({
           'service': `${req.body.service}`,
           'target': `${req.body.target}`,
-          'quantity': '50',
+          'quantity': '25',
           'api_id': `${process.env.API_ID_IRVANKEDESMM}`,
           'api_key': `${process.env.API_KEY_IRVANKEDESMM}`
         });
