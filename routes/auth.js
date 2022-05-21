@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const multer  = require('multer')
-const upload = multer({ dest: 'uploads/'})
+const upload = multer({ dest: 'uploads/', limits : {fileSize: 512}})
 const AuthController = require('../controllers/auth.js')
 
 router.post('/register',upload.single('photo'), AuthController.register)
